@@ -5,10 +5,10 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "class_factory"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Class Factory: Factory_girl-like syntax for dynamically creating Ruby classes}
+    gem.description = %Q{Use syntax similar to factory_girl to create new ActiveRecord or other test classes (vs. instances of an existing model).}
     gem.email = "pat@patshaughnessy.net"
-    gem.homepage = "http://github.com/patshaughnessy/class_factory"
+    gem.homepage = "http://patshaughnessy.net/class_factory"
     gem.authors = ["Pat Shaughnessy"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings

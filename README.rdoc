@@ -1,17 +1,61 @@
-= class_factory
+= Class Factory: Factory_girl syntax for dynamically creating Ruby classes
 
-Description goes here.
+Class Factory will dynamically create classes using a factories model similar to {factory_girl}[http://github.com/thoughtbot/factory_girl]. But instead of passing a block with model attributes into the factory definition, you pass in a migration defining the attributes of the new model class you want to create:
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+  ClassFactory.define :person do |p|
+    p.string  :first_name
+    p.string  :last_name
+    p.integer :age
+  end
 
-== Copyright
+Now when you need a "Person" model in your tests you create one like this:
 
-Copyright (c) 2010 Pat Shaughnessy. See LICENSE for details.
+  ClassFactory :person
+  => Person(id: integer, first_name: string, last_name: string, age: integer)
+
+This can be useful if you're writing tests for a gem or plugin and don't want to load the entire Rails environment, or have access to existing models in a target application. By default Class Factory creates ActiveRecord model classes, but using the :super option you can create any sort of Ruby class. Class Factory also makes it easy for each of your tests to use a different variation on a target class. For example, this will delete the Person model we created above, and create a new Person model that belongs to a group:
+
+  ClassFactory :person, :class_eval => 'belongs_to :group' do |p|
+    p.string  :first_name
+    p.string  :middle_name
+    p.string  :last_name
+    p.string  :group_id
+  end
+  => Person(id: integer, first_name: string, middle_name: string, last_name: string, group_id: string)
+
+Creating different variations of the same class can be useful if you're writing tests for a generator, plugin or some other code which has different behavior depending on what classes you run it against.
+
+== Install
+
+  gem install class_factory
+
+== Options
+
+Default: create a new ActiveRecord model, along with a corresponding table in your database:
+  ClassFactory :person
+
+Execute a migration on the new table specified as a block, defining the attributes of the new model class:
+  ClassFactory :person do |p|
+    p.string  :first_name
+    p.string  :last_name
+    p.integer :age
+  end
+
+Create a class with a specified superclass (default is ActiveRecord::Base):
+  ClassFactory :person_array, :super => Array
+If SuperClass is not a subclass of ActiveRecord::Base then Class Factory won't create a table or run a migration. You can use this to create plain Ruby object classes.
+
+Create a class called "DifferentClass" instead of "Person:"
+  ClassFactory :person, :class => 'DifferentClass'
+
+Run the given code inside the new class using class_eval:
+  ClassFactory :person, :class_eval => 'has_many :shoes'
+
+Create a table with the given name, instead of a table called "people:"
+  ClassFactory :person, :class_eval => 'set_table_name :table_name', :table => 'table_name'
+
+If you provide options when the factory is defined they will be applied to each class created with the factory. You can also provide options when you create a class, in which case they will override the factory options.
+
+== Detailed examples and more information
+
+See: {http://patshaughnessy.net/class_factory}[http://patshaughnessy.net/class_factory]
